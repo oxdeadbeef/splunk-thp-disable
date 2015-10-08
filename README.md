@@ -14,4 +14,3 @@ see: [What are Huge Pages and what are the advantages of using them?](https://ac
 * [Splunk Answers](http://answers.splunk.com/answers/188875/how-do-i-disable-transparent-huge-pages-thp-and-co.html)
 
 This currently just makes and RPM for RHEL based systems. It will work on RHEL7 which uses systemd. But I will updated it eventually for all Linux distros.
-
