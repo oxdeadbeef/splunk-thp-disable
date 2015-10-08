@@ -1,0 +1,19 @@
+#
+# Control Transparent Huge Pages
+#
+# For RHEL6 systems
+#
+# $ cat /sys/kernel/mm/redhat_transparent_hugepage/enabled
+# [always] madvise never
+# $ cat /sys/kernel/mm/redhat_transparent_hugepage/defrag
+# [always] madvise never
+#
+# For non RHEL systems with Transparent Huge Pages (CENTOS/OEL)
+#
+# $ cat /sys/kernel/mm/transparent_hugepage/enabled
+# [always] madvise never
+# $ cat /sys/kernel/mm/transparent_hugepage/defrag
+# [always] madvise never
+#
+ENABLED=never
+DEFRAG=never

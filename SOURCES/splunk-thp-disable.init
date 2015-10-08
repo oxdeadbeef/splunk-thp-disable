@@ -1,0 +1,121 @@
+#!/bin/sh
+#
+# splunk-thp-disable Disable Transparent Huge Pages
+#
+# chkconfig:   2345 70 90 
+# description: Disable Transparent Huge Pages
+#
+RETVAL=0
+
+### BEGIN INIT INFO
+# Provides: 
+# Required-Start: 
+# Required-Stop: 
+# Should-Start: 
+# Should-Stop: 
+# Default-Start: 
+# Default-Stop: 
+# Short-Description: 
+# Description:      
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+prog="splunk-thp-disable"
+
+[ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
+
+THP_RHEL_ENABLED=/sys/kernel/mm/redhat_transparent_hugepage/enabled
+THP_RHEL_DEFRAG=/sys/kernel/mm/redhat_transparent_hugepage/defrag
+
+THP_ENABLED=/sys/kernel/mm/transparent_hugepage/enabled
+THP_DEFRAG=/sys/kernel/mm/transparent_hugepage/defrag
+
+test -f "$THP_RHEL_ENABLED" &&
+	THP_ENABLED="$THP_RHEL_ENABLED"
+
+test -f "$THP_RHEL_DEFRAG" &&
+	THP_DEFRAG="$THP_RHEL_DEFRAG"
+
+start() {
+	#
+	# enabled
+	#
+	if [ -n "$ENABLED" ]
+	then
+		echo -n $"Setting "
+		if test -f "$THP_ENABLED"
+		then
+			echo "$THP_ENABLED: $ENABLED"
+			echo "$ENABLED" > "$THP_ENABLED"
+		else
+			echo $"THP enabled: not available"
+		fi
+	fi
+
+	#
+	# defrag
+	#
+	if [ -n "$DEFRAG" ]
+	then
+		echo -n $"Setting "
+		if test -f "$THP_DEFRAG"
+		then
+			echo "$THP_DEFRAG: $DEFRAG"
+			echo "$DEFRAG" > "$THP_DEFRAG"
+		else
+			echo $"THP defrag: not available"
+		fi
+	fi
+
+    return 0
+}
+
+stop() {
+    return 0
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    restart
+}
+
+force_reload() {
+    restart
+}
+
+case "$1" in
+    start)
+        $1
+        ;;
+    stop)
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    reload)
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+		echo "$THP_ENABLED"
+		cat "$THP_ENABLED" 
+		echo "$THP_DEFRAG"
+		cat "$THP_DEFRAG" 
+        ;;
+    condrestart|try-restart)
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+        exit 2
+esac
+exit $?

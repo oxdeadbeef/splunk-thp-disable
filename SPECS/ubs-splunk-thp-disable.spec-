@@ -1,0 +1,70 @@
+#
+# Splunk Disable Transparent Huge Pages
+#
+
+%define __arch_install_post %{nil}
+
+#/usr/lib/rpm/check-buildroot
+
+AutoReqProv: no
+#%global __os_install_post %{nil}
+#%define _unpackaged_files_terminate_build 0
+
+%define product_id		JE0
+%define product_name	thp-disable
+%define product_version	1.0
+%define product_release	02
+
+%define app_id          %{product_id}
+%define app_name        %{product_name}
+%define app_major_version %{product_version}
+%define app_release     %{product_release}
+%define app_version     %{app_major_version}-%{app_release}
+%define app_destdir     /app/%{app_id}/%{app_name}/%{app_version}
+%define app_dyndir      /app/%{app_id}/dyn/%{app_name}/
+
+Conflicts: je0-thp
+
+Name:      	je0-%{app_name}
+Summary:   	UBS - %{app_id} - %{app_name} - Disable Transparent Huge Pages
+Version:   	%{app_major_version}
+Release:   	%{app_release}%{?dist}
+Group:     	UBS/ELM
+URL:       	http://confluence.swissbank.com/display/SPLUNKENG/Transparent+Huge+Pages
+BuildArch: noarch
+#Packager:  	Jason Prondak <jason.prondak@ubs.com>
+Vendor:    	UBS AG
+License:	UBS AG (C) 2015
+Source0:	thp-disable.init
+Source1:	thp-disable.sysconfig
+
+%description
+The package installs a startup script to control THP (Transparent Huge Pages)
+
+Requires(post): chkconfig
+Requires(preun): chkconfig
+# This is for /sbin/service
+Requires(preun): initscripts
+
+%install
+install -d -m 755 $RPM_BUILD_ROOT/%{_initrddir}
+install -d -m 755 $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig
+install -m 755 %{SOURCE0} $RPM_BUILD_ROOT/%{_initrddir}/%{app_name}
+install -m 644 %{SOURCE1} $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/%{app_name}
+
+%files
+%{_initrddir}/%{app_name}
+%{_sysconfdir}/sysconfig/%{app_name}
+
+%post
+
+# This adds the proper /etc/rc*.d links for the script
+/sbin/chkconfig --add %{app_name}
+/sbin/service %{app_name} start
+
+%preun
+
+if [ $1 -eq 0 ] ; then
+    /sbin/service %{app_name} stop
+    /sbin/chkconfig --del %{app_name}
+fi
